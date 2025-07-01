@@ -3,3 +3,4 @@
 - nest
 - postgreSQL
 - prisma
+- ЮKassa
