@@ -48,16 +48,23 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Post('/login/access-token')
-  async getNewToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async getNewToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const refershTokenFromCookies =
       req.cookies[this.authService.REFRESH_TOKEN_NAME];
 
-	if(!refershTokenFromCookies) {
-		this.authService.removeRefreshTokenFromResponse(res)
-		throw new UnauthorizedException('Refresh токен не прошел')
-	}
+    if (!refershTokenFromCookies) {
+      this.authService.removeRefreshTokenFromResponse(res);
+      throw new UnauthorizedException('Refresh токен не прошел');
+    }
 
-	const { refreshToken, ...response } = await this.authService.getNewToken(refershTokenFromCookies);
+    const { refreshToken, ...response } = await this.authService.getNewToken(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      refershTokenFromCookies
+    );
 
     this.authService.addRefreshTokenToResponse(res, refreshToken);
 
@@ -66,10 +73,10 @@ export class AuthController {
 
   @HttpCode(200)
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
-	this.authService.removeRefreshTokenFromResponse(res)
+  logout(@Res({ passthrough: true }) res: Response) {
+    this.authService.removeRefreshTokenFromResponse(res);
 
-	return true;
+    return true;
   }
 
   @Get('google')
@@ -78,12 +85,18 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthCallback(@Req() req: any, @Res({passthrough: true}) res: Response) {
-	const { refreshToken, ...response } = await this.authService.validateOAuthLogin(req);
+  async googleAuthCallback(
+    @Req() req: any,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const { refreshToken, ...response } =
+      await this.authService.validateOAuthLogin(req);
 
-	this.authService.addRefreshTokenToResponse(res, refreshToken)
-	
-	return res.redirect(`${process.env['CLIENT_URL']}/dashboard?accessToken=${response.accessToken}`)
+    this.authService.addRefreshTokenToResponse(res, refreshToken);
+
+    return res.redirect(
+      `${process.env['CLIENT_URL']}/dashboard?accessToken=${response.accessToken}`
+    );
   }
 
   @Get('yandex')
@@ -92,11 +105,17 @@ export class AuthController {
 
   @Get('yandex/callback')
   @UseGuards(AuthGuard('yandex'))
-  async yandexAuthCallback(@Req() req: any, @Res({passthrough: true}) res: Response) {
-	const { refreshToken, ...response } = await this.authService.validateOAuthLogin(req);
+  async yandexAuthCallback(
+    @Req() req: any,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const { refreshToken, ...response } =
+      await this.authService.validateOAuthLogin(req);
 
-	this.authService.addRefreshTokenToResponse(res, refreshToken)
-	
-	return res.redirect(`${process.env['CLIENT_URL']}/dashboard?accessToken=${response.accessToken}`)
+    this.authService.addRefreshTokenToResponse(res, refreshToken);
+
+    return res.redirect(
+      `${process.env['CLIENT_URL']}/dashboard?accessToken=${response.accessToken}`
+    );
   }
 }
